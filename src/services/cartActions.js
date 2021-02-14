@@ -1,0 +1,4 @@
+var cart = [];
+
+
+export {cart}
