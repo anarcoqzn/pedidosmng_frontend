@@ -160,7 +160,7 @@ export default function NewProduct({setLoadProducts, product}) {
         
         data.append('file', file.file);
         data.append('name', file.name);
-        data.append('product',productID);
+        data.append('reference',productID);
         
         const response = await api.post('image', data);
         ids.push(response.data._id);      
