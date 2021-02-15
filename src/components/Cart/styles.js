@@ -29,6 +29,7 @@ export const CartList = styled.div `
 
 export const CartAction = styled.div `
   width:30vw;
+  height: 13vw;
   background-color: #f0f0f0;
   display: grid;
   span {
@@ -37,9 +38,10 @@ export const CartAction = styled.div `
     font-size: 2vw;
   }
   #subtotal {
-    font-size: 2vw;
-    margin-top: -2vw;
+    font-size: 3vw;
+    margin-top: 0;
     color: #900020;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   }
   button {
     width: 100%;
@@ -79,6 +81,10 @@ export const Item = styled.li `
     
     span{
       font-size: 1.1vw;
+    }
+    .size{
+      color:#900020;
+      font-weight: bolder;
     }
     margin-left: 1vw;
     input {
