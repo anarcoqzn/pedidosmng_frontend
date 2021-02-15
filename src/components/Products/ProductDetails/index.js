@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import {cart} from '../../../services/cartActions'
 import { useSelector, useDispatch } from 'react-redux';
 import { productDetails } from '../../../services/actions/productActions';
 import { Actions, Container, Image, ImageContainer, ImagesSelect, Info, SubContainer } from './styles';
@@ -63,9 +62,10 @@ export default function ProductDetails(props) {
           <li>
             <b>{product.value && product.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL', minimumFractionDigits: 2})}</b>
           </li>
-          <li>
-            <span>{product.description}</span>
-          </li>
+          <span className="category">{product.category}</span>
+          <li className="description"><p >{product.description}</p></li>
+          <li className="rating">Avaliação: {product.rating}</li>
+
         </ul>
       </Info>
 

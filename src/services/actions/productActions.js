@@ -32,10 +32,10 @@ const productSave = (data) => async (dispatch) => {
   }
 }
 
-const productEdit = (data) => async (dispatch) => {
+const productEdit = (productID, data) => async (dispatch) => {
   try {
     dispatch({type: PRODUCT_EDIT_REQUEST});
-    const {response} = await api.put("/product", data);
+    const {response} = await api.put("/product/"+productID, data);
     dispatch({type: PRODUCT_EDIT_SUCCESS, payload: response.data})
   } catch (error) {
     dispatch({type: PRODUCT_EDIT_FAIL, payload: error.message});

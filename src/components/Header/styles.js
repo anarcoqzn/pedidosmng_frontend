@@ -11,7 +11,8 @@ export const HeaderContainer = styled.header`
   color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
-  div {
+  a {
+    color: white;
     margin-right: auto;
     margin-left: 2px;
     display: flex;

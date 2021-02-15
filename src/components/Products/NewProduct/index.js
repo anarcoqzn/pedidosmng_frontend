@@ -6,7 +6,6 @@ import  {Button} from '../../Button/styles.js';
 import api from '../../../services/api';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
-
 import ProductCard from '../ProductCard';
 import FileList from '../FileList';
 import {Container} from './styles.js';
@@ -19,12 +18,14 @@ export default function NewProduct({setLoadProducts, product}) {
   const [ size, setSize ] = useState([]);
   const [ quantity, setQuantity ] = useState(0);
   const [ images, setImages ] = useState([]);
+  const [ category, setCategory ] = useState("");
   const filesize = require('filesize');
 
   function handleName(input) {setName(input.target.value)};
   function handleValue(input){setValue(input)};
   function handleDescription(input){setDescription(input.target.value);}
   function handleQuantity(input){setQuantity(input);}
+  function handleCategory(input){setCategory(input.target.value.toUpperCase())};
 
   function handleSize(input) {
     const element = document.getElementById(input);
@@ -75,6 +76,7 @@ export default function NewProduct({setLoadProducts, product}) {
           description:description,
           size:size,
           quantity:quantity,
+          category,
           images:[]
         };
 
@@ -99,6 +101,7 @@ export default function NewProduct({setLoadProducts, product}) {
           description:description,
           size:size,
           quantity:quantity,
+          category,
           images:ids
         };
 
@@ -179,6 +182,7 @@ export default function NewProduct({setLoadProducts, product}) {
     setQuantity(0);
     setImages([]);
     setLoadProducts(prev => !prev);
+    setCategory("");
   }
 
   useEffect(() => {
@@ -188,6 +192,7 @@ export default function NewProduct({setLoadProducts, product}) {
     setSize([]);
     setQuantity(0);
     setImages([]);
+    setCategory("");
 
     if(product){
       setName(product.name);
@@ -196,6 +201,7 @@ export default function NewProduct({setLoadProducts, product}) {
       setQuantity(product.quantity);
       setDescription(product.description);
       setImages(product.images);
+      setCategory(product.category);
     
       for (let i = 0; i < product.size.length; i++) {
         document.getElementById(product.size[i]).style.backgroundColor = "#1890ff";
@@ -221,7 +227,11 @@ export default function NewProduct({setLoadProducts, product}) {
       </Form.Item>
 
       <Form.Item label="Detalhes">
-        <Input value={description} onChange={handleDescription} maxLength={53} placeholder="Fale sobre o Produto"/>
+        <Input value={description} onChange={handleDescription} placeholder="Fale sobre o Produto"/>
+      </Form.Item>
+
+      <Form.Item label="Categoria">
+        <Input value={category} onChange={handleCategory} placeholder="Ex.: Calça, Blusa, Caneca"/>
       </Form.Item>
 
       <Form.Item label="Tamanhos">

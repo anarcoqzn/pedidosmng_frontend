@@ -25,7 +25,6 @@ export default function ProductCard({product}) {
       <ProductInfo>
         <span id="name">{product.name}</span>
         <span id="value">{product.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL', minimumFractionDigits: 2})}</span>
-        <span id="description">{product.description}</span>
       </ProductInfo>
     </Card>
   )

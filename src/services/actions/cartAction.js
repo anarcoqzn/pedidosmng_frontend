@@ -1,5 +1,5 @@
 import api from '../api';
-import { CART_ADD_ITEM } from '../constants';
+import { CART_ADD_ITEM, CART_REMOVE_ITEM } from '../constants';
 
 const addToCart = (productId, quantity, sizes) => async (dispatch) => {
   try {
@@ -16,4 +16,8 @@ const addToCart = (productId, quantity, sizes) => async (dispatch) => {
   }
 }
 
-export { addToCart }
+const removeFromCart = (productID) => (dispatch) => {
+  dispatch({type: CART_REMOVE_ITEM, payload: productID});
+}
+
+export { addToCart, removeFromCart }

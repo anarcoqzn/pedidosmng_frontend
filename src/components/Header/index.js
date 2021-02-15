@@ -8,11 +8,11 @@ export default function Header() {
     <HeaderContainer > 
       <img src={img} alt=""/>
       <div>
-
+      <a href="/">
       Gerenciador de Pedidos 
       D<div id="point">'</div>12<div id="cristo">CRISTO</div>
+      </a>
       </div>
-    
     </HeaderContainer>
   )
 }

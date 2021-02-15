@@ -60,11 +60,22 @@ export const Info = styled.div `
   padding: 1rem;
   b {
     font-size: 3vw;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   }
-  span {
+  h1{
+    font-size: 2vw;
+  }
+  .description {
     color: #999;
     font-weight: bolder;
-    font-size: 1.3vw;
+    text-align: justify;
+    max-width: 40vw;
+    margin-bottom: 0vw;;
+  }
+
+  .rating{
+    font-size: 1.5vw;
+    color: goldenrod;
   }
 `;
 
