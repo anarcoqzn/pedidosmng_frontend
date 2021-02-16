@@ -46,18 +46,8 @@ export const CartAction = styled.div `
   button {
     width: 100%;
     height: 3vw;
-    cursor: pointer;
-    background: orange;
-    border: .1rem solid #f0c040;
-    transition: .2s;
     font-weight: bolder;
-    border-radius: 1vw;
     font-size: 1.5vw;
-    :hover {
-      border: .1rem solid black;
-      color: black;
-      background: darkorange;
-    }
   }
 `;
 
@@ -101,25 +91,25 @@ export const Item = styled.li `
 
   .item-price {
     display: grid;
+    grid-template-rows: auto auto auto;
     margin-left: auto;
     margin-right: 1vw;
     font-size: 1.2vw;
-
+    justify-content: center;
     span{
       margin-left: auto;
       margin-right: auto;
     }
-    button {
+    svg {
+      cursor: pointer;
+      color: tomato;
+      border-radius: 10px;
       margin-left: auto;
       margin-right: auto;
-      width: 1vw;
-      border: 0px;
-      background-color: transparent;
-      color: tomato;
-      cursor:pointer;
-      transition: .25s;
       :hover{
+        transition: .2s;
         color: red;
+        box-shadow:0 1px 20px -2px rgb(0 0 0 / 16%), 0 3px 6px 0 rgb(0 0 0 / 12%), 0 5px 20px 4px rgb(0 0 0 / 9%);
       }
     }
   }

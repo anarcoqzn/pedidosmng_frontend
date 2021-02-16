@@ -9,6 +9,8 @@ import { useEffect, useState } from 'react';
 import EventDetails from './components/Events/EventDetails';
 import ProductDetails from './components/Products/ProductDetails';
 import Cart from './components/Cart';
+import Login from './components/Login';
+import Register from './components/Register';
 
 function App() {
   const [update, setUpdate] = useState(false);
@@ -26,6 +28,8 @@ function App() {
           <Route path="/eventos/:id" component={EventDetails}/>
           <Route path="/produtos/:id?" component={ProductDetails}/>
           <Route path="/carrinho/:id?" component={Cart}/>
+          <Route path="/login" component={Login}/>
+          <Route path="/cadastro" component={Register}/>
         </BrowserRouter>
       </div>
   );

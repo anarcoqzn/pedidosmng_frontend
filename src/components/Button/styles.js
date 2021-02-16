@@ -10,7 +10,7 @@ export const Button = styled.button`
   border-radius: 5px;
   background: ${props => (props.chosen && (props.id === props.chosen)) ? props.color : "transparent"};
   cursor: pointer;
-  :hover {
+  :hover, :focus {
     background: ${props => props.color};
     color:white;
     transition: .3s;

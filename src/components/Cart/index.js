@@ -5,6 +5,7 @@ import { addToCart, removeFromCart } from '../../services/actions/cartAction';
 import { Divider } from 'antd';
 import { Link } from 'react-router-dom';
 import { FiTrash2 } from 'react-icons/fi';
+import { Button } from '../Button/styles';
 
 export default function Cart(props) {
   
@@ -66,7 +67,7 @@ export default function Cart(props) {
                 
                 <b>{item.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL', minimumFractionDigits: 2})}</b>
                 
-                <button type="button" onClick={()=>handleRemoveFromCart(item._id)}><FiTrash2 size="2vw"/></button>
+                <FiTrash2 size="2vw" onClick={()=>handleRemoveFromCart(item._id)}/>
               </div>
             </Item>
           })}
@@ -82,7 +83,7 @@ export default function Cart(props) {
         <span id="subtotal">
           {cartItems.reduce((acumulator, element) => acumulator + element.value * element.quantity,0).toLocaleString('pt-br',{style: 'currency', currency: 'BRL', minimumFractionDigits: 2})}
         </span>
-      <button disabled={cartItems.length === 0} onClick={checkoutHandler}>Continuar para o pagamento</button>
+      <Button color="orange" disabled={cartItems.length === 0} onClick={checkoutHandler}>Continuar para o pagamento</Button>
      </CartAction>
 
    </Container>
