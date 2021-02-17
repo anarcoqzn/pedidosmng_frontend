@@ -1,11 +1,11 @@
+import cartConstants from '../constants/cart';
 import api from '../api';
-import { CART_ADD_ITEM, CART_REMOVE_ITEM } from '../constants';
 import Cookie from 'js-cookie';
 
 const addToCart = (productId, quantity, size) => async (dispatch, getState) => {
   try {
     const { data } = await api.get("/product/"+productId);
-    await dispatch({type: CART_ADD_ITEM, payload: {
+    await dispatch({type: cartConstants.CART_ADD_ITEM, payload: {
       _id: data._id+size,
       product: data._id,
       name: data.name,
@@ -23,7 +23,7 @@ const addToCart = (productId, quantity, size) => async (dispatch, getState) => {
 }
 
 const removeFromCart = (itemID) => (dispatch, getState) => {
-  dispatch({type: CART_REMOVE_ITEM, payload: itemID});
+  dispatch({type: cartConstants.CART_REMOVE_ITEM, payload: itemID});
   
   const {cart: {cartItems}} = getState();
   Cookie.set("cartItems", JSON.stringify(cartItems));

@@ -1,13 +1,13 @@
-import { EVENT_DETAILS_FAIL, EVENT_DETAILS_REQUEST, EVENT_DETAILS_SUCCESS, EVENT_LIST_FAIL, EVENT_LIST_REQUEST, EVENT_LIST_SUCCESS } from "../constants";
+import eventConstants from '../constants/event';
 
 function eventListReducer(state = {events:[]}, action){
 
   switch (action.type) {
-    case EVENT_LIST_REQUEST:
+    case eventConstants.EVENT_LIST_REQUEST:
       return {loading: true};
-    case EVENT_LIST_SUCCESS:
+    case eventConstants.EVENT_LIST_SUCCESS:
       return {loading: false, events: action.payload};
-    case EVENT_LIST_FAIL:
+    case eventConstants.EVENT_LIST_FAIL:
       return {loading: false, error: action.payload};
     default :
     return state;
@@ -16,11 +16,11 @@ function eventListReducer(state = {events:[]}, action){
 
 function eventDetailsReducer(state = {event:{}}, action){
   switch (action.type) {
-    case EVENT_DETAILS_REQUEST:
+    case eventConstants.EVENT_DETAILS_REQUEST:
       return {loading: true};
-    case EVENT_DETAILS_SUCCESS:
+    case eventConstants.EVENT_DETAILS_SUCCESS:
       return {loading: false, event: action.payload};
-    case EVENT_DETAILS_FAIL:
+    case eventConstants.EVENT_DETAILS_FAIL:
       return { loading: false, error: action.payload};
     default :
       return state;
