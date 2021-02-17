@@ -20,16 +20,14 @@ export default function Register(props) {
   const filesize = require('filesize');
 
   function onUpload(files) {
-    const uploadedFiles = files.map(file => {
-      return {
-        file,
+    const uploadedFile = {
+        file:files[0],
         _id: uniqueId(),
-        name:file.name,
-        readableSize: filesize(file.size),
-        url: URL.createObjectURL(file)
-      }
-    });
-    setImage(uploadedFiles[0]);
+        name:files[0].name,
+        readableSize: filesize(files[0].size),
+        url: URL.createObjectURL(files[0])
+      };
+    setImage(uploadedFile);
   }
 
   useEffect(()=>{

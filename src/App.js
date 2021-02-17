@@ -12,11 +12,11 @@ import Cart from './components/Cart';
 import Login from './components/Login';
 import Register from './components/Register';
 
-function App() {
+function App(props) {
   const [update, setUpdate] = useState(false);
   
   useEffect(() => {
-
+    
   },[update])
 
   return (
