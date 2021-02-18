@@ -14,6 +14,7 @@ export default function Products(props) {
   const [newProduct, setNewProduct] = useState(false);
   const [loadProducts, setLoadProducts] = useState(false);
   const [edit, setEdit] = useState(null);
+  const {userInfo} = useSelector(state => state.userLogin);
   
   const productList = useSelector(state => state.productList);
   const { products, loading, error } = productList;
@@ -58,16 +59,17 @@ export default function Products(props) {
     setEdit(null);
     setNewProduct(false);
     
-    dispatch(listProducts());
+    if(userInfo) dispatch(listProducts(userInfo.token));
+    else dispatch(listProducts());
     setSelectedProducts(props.products);
     
-  },[loadProducts, dispatch, props.products]);
+  },[loadProducts, userInfo, dispatch, props.products]);
 
   return (
     loading ? < div>LOADING ...</div> :
     error ? <div>{error}</div>:
     newProduct ? 
-    <NewProduct setNewProduct={setNewProduct} setLoadProducts={setLoadProducts} product={edit}/> :
+    <NewProduct setNewProduct={setNewProduct} setLoadProducts={setLoadProducts} editProduct={edit}/> :
     <Container>
       {props.selectProducts ? <p>Selecione os produtos desejados</p>: null}
 

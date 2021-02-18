@@ -5,13 +5,14 @@ import { uniqueId } from 'lodash';
 import  {Button} from '../../Button/styles.js';
 import api from '../../../services/api';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 
 import ProductCard from '../ProductCard';
 import FileList from '../FileList';
 import {Container} from './styles.js';
 const { confirm } = Modal;
 
-export default function NewProduct({setLoadProducts, product}) {
+export default function NewProduct({setLoadProducts, editProduct}) {
   const [ name, setName ] = useState("");
   const [ value, setValue ] = useState(0);
   const [ description, setDescription ] = useState("");
@@ -26,6 +27,8 @@ export default function NewProduct({setLoadProducts, product}) {
   function handleDescription(input){setDescription(input.target.value);}
   function handleQuantity(input){setQuantity(input);}
   function handleCategory(input){setCategory(input.target.value.toUpperCase())};
+
+  const {userInfo} = useSelector(state => state.userLogin);
 
   function handleSize(input) {
     const element = document.getElementById(input);
@@ -69,7 +72,7 @@ export default function NewProduct({setLoadProducts, product}) {
   async function confirmProduct() {
     if (!isEmpty(name) && value > 0 && images.length > 0){
       var data = {}
-      if(!product){
+      if(!editProduct){
         data = {
           name:name,
           value:value,
@@ -77,22 +80,35 @@ export default function NewProduct({setLoadProducts, product}) {
           size:size,
           quantity:quantity,
           category,
-          images:[]
+          images:[],
+          createdBy: userInfo.user._id
         };
-
-        const temp = await api.post('/product', data);
+        
+        const temp = await api.post('/user/product', data, {
+          headers:{
+            Authorization: 'Bearer '+userInfo.token
+          }
+        });
         const ids = await processImages(temp.data._id);
         data = {images:ids}
 
-        await api.put(`/product/${temp.data._id}`,data);
+        await api.put(`/user/product/${temp.data._id}`,data, {
+          headers:{
+            Authorization: 'Bearer '+userInfo.token
+          }
+        });
         message.success("Novo produto criado com sucesso!");
       }
       else{
-        const ids = await processImages(product._id);
+        const ids = await processImages(editProduct._id);
         
-        for( let i = 0; i < product.images.length; i++) {
-          const img = product.images[i]._id;
-          if( !ids.includes(img)) await api.delete(`image/${img}`);
+        for( let i = 0; i < editProduct.images.length; i++) {
+          const img = editProduct.images[i]._id;
+          if( !ids.includes(img)) await api.delete(`/user/image/${img}`,{
+            headers:{
+              Authorization: 'Bearer '+userInfo.token
+            }
+          });
         }
 
         data = {
@@ -105,7 +121,11 @@ export default function NewProduct({setLoadProducts, product}) {
           images:ids
         };
 
-        await api.put(`/product/${product._id}`,data);
+        await api.put(`/user/product/${editProduct._id}`,data,{
+          headers:{
+            Authorization: 'Bearer '+userInfo.token
+          }
+        });
         message.success("Produto alterado com sucesso!");
       }
       clearAll();
@@ -116,12 +136,16 @@ export default function NewProduct({setLoadProducts, product}) {
   }
 
   async function checkProductDelete() {
-    const t_events = await api.get(`event?productId=${product._id}`);
+    const t_events = await api.get(`event?productId=${editProduct._id}`);
     showDeleteConfirm(t_events.data);
   }
 
   async function deleteProduct(){
-    await api.delete(`product/${product._id}`);
+    await api.delete(`/user/product/${editProduct._id}`, {
+      headers: {
+        Authorization: 'Bearer '+userInfo.token
+      }
+    });
     message.success("Produto apagado com sucesso!")
     clearAll();
   }
@@ -132,12 +156,12 @@ export default function NewProduct({setLoadProducts, product}) {
     var content = "";
     
     if (events.length > 0) {
-      title = `O produto ${product.name} pertence aos eventos:`;
+      title = `O produto ${editProduct.name} pertence aos eventos:`;
       content = content.concat(events.map(e => {return e.title})).concat(";");
     }else{
-      title = `Tem certeza que deseja excluir ${product.name}?`
-      content = `${product.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL', minimumFractionDigits: 2})}; `+
-      `${product.description}`
+      title = `Tem certeza que deseja excluir ${editProduct.name}?`
+      content = `${editProduct.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL', minimumFractionDigits: 2})}; `+
+      `${editProduct.description}`
     }
 
     confirm({
@@ -165,7 +189,11 @@ export default function NewProduct({setLoadProducts, product}) {
         data.append('name', file.name);
         data.append('reference',productID);
         
-        const response = await api.post('image', data);
+        const response = await api.post('/user/image', data, {
+          headers:{
+            Authorization: 'Bearer '+userInfo.token
+          }
+        });
         ids.push(response.data._id);      
       }else{
         ids.push(images[i]._id);
@@ -181,8 +209,8 @@ export default function NewProduct({setLoadProducts, product}) {
     setSize([]);
     setQuantity(0);
     setImages([]);
-    setLoadProducts(prev => !prev);
     setCategory("");
+    setLoadProducts(prev => !prev);
   }
 
   useEffect(() => {
@@ -194,21 +222,21 @@ export default function NewProduct({setLoadProducts, product}) {
     setImages([]);
     setCategory("");
 
-    if(product){
-      setName(product.name);
-      setValue(product.value);
-      setSize(product.size);
-      setQuantity(product.quantity);
-      setDescription(product.description);
-      setImages(product.images);
-      setCategory(product.category);
+    if(editProduct){
+      setName(editProduct.name);
+      setValue(editProduct.value);
+      setSize(editProduct.size);
+      setQuantity(editProduct.quantity);
+      setDescription(editProduct.description);
+      setImages(editProduct.images);
+      setCategory(editProduct.category);
     
-      for (let i = 0; i < product.size.length; i++) {
-        document.getElementById(product.size[i]).style.backgroundColor = "#1890ff";
-        document.getElementById(product.size[i]).style.color = "white";
+      for (let i = 0; i < editProduct.size.length; i++) {
+        document.getElementById(editProduct.size[i]).style.backgroundColor = "#1890ff";
+        document.getElementById(editProduct.size[i]).style.color = "white";
       }
     }
-  },[product]);
+  },[editProduct]);
 
   return (
     <Container>
@@ -261,7 +289,7 @@ export default function NewProduct({setLoadProducts, product}) {
     <div className="create-cancel-btns">
       <Button color="#32CD32" onClick={confirmProduct}>Confirmar</Button>
       <Button color="#FFD700" onClick={clearAll}>Cancelar</Button>
-      {product ? <Button color="#DB7093" onClick={checkProductDelete} >Deletar</Button>:null}
+      {editProduct ? <Button color="#DB7093" onClick={checkProductDelete} >Deletar</Button>:null}
     </div>
     </Container>
   )

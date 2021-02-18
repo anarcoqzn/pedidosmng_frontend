@@ -1,11 +1,11 @@
 import eventConstants from '../constants/event';
 import api from "../api";
 
-const listEvents = () => async (dispatch) => {
+const listEvents = (query) => async (dispatch) => {
 
   try{
     dispatch({type: eventConstants.EVENT_LIST_REQUEST});
-    const {data} = await api.get("/event");
+    const {data} = await api.get("/event"+query);
     dispatch({type: eventConstants.EVENT_LIST_SUCCESS, payload: data});
   }catch(err){
     dispatch({type: eventConstants.EVENT_LIST_FAIL, payload: err.message});

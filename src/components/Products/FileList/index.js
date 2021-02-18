@@ -2,7 +2,7 @@ import React from 'react'
 import { Container, FileInfo } from './styles';
 import { Image } from 'antd';
 
-export default function FileList({ files, onDelete, values, setValues, isFromCart, setCart }) {
+export default function FileList({ files, onDelete, values, isFromCart, setCart }) {
   const filesize = require('filesize');
 
   const handleDelete = (file) => {

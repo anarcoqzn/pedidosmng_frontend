@@ -1,30 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Carousel } from 'antd';
 import { Card, ProductInfo, Image } from './styles'
 
 export default function ProductCard({product}) {
-  const [images, setImages] = useState([]);
-
-  useEffect(() => {
-    setImages([]);
-        
-  }, []);
-
-  useEffect(() => {
-    if(product && product.images) setImages(product.images)
-  }, [product])
-
+  
   return (
     <Card>
       <Carousel
         autoplay
       >
-        {images.map((img) => {return <Image key={img._id} src={img.url}/>})}
+        {product.images.map((img) => {return <Image key={img._id} src={img.url}/>})}
       </Carousel>
       
       <ProductInfo>
         <span id="name">{product.name}</span>
-        <span id="value">{product.value.toLocaleString('pt-br',{style: 'currency', currency: 'BRL', minimumFractionDigits: 2})}</span>
+        <span id="value">{Number(product.value).toLocaleString('pt-br',{style: 'currency', currency: 'BRL', minimumFractionDigits: 2})}</span>
       </ProductInfo>
     </Card>
   )

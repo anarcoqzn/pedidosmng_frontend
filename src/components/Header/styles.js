@@ -11,22 +11,34 @@ export const HeaderContainer = styled.header`
   color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
-  a {
-    color: white;
-    margin-right: auto;
-    margin-left: 2px;
-    display: flex;
-
-    #point {
-      color:darkorange;
-    }
-    #cristo {
-      color:darkorange;
+  .brand-container{
+    a {
+      color: white;
+      margin-right: auto;
       margin-left: 2px;
+      display: flex;
+
+      #point {
+        color:darkorange;
+      }
+      #cristo {
+        color:darkorange;
+        margin-left: 2px;
+      }
     }
   }
-
   img {
     height: 50px;
+  }
+
+  .userName{
+    margin-left: auto;
+    margin-right: 1vw;
+    a {
+      color: #FFF;
+      :hover {
+        color: darkorange;
+      }
+    }
   }
 `;
