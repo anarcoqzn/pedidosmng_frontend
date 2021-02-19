@@ -28,13 +28,12 @@ function productDetailsReducer(state = {product:{}}, action){
   }
 }
 
-function productSaveReducer(state = {product:{}}, action){
-
+function productCreateReducer(state = {product:{}}, action){
   switch (action.type) {
     case productConstants.PRODUCT_SAVE_REQUEST:
       return {loading: true};
     case productConstants.PRODUCT_SAVE_SUCCESS:
-      return {loading: false, product: action.payload};
+      return {loading: false, success: true, product: action.payload};
     case productConstants.PRODUCT_SAVE_FAIL:
       return {loading: false, error: action.payload};
     default :
@@ -42,4 +41,17 @@ function productSaveReducer(state = {product:{}}, action){
   }
 }
 
-export {productListReducer, productDetailsReducer, productSaveReducer}
+function productEditReducer( state = {product:{}}, action){
+  switch (action.type) {
+    case productConstants.PRODUCT_EDIT_REQUEST:
+      return {loading: true};
+    case productConstants.PRODUCT_EDIT_SUCCESS:
+      return {loading: false, success: true, product: action.payload};
+    case productConstants.PRODUCT_EDIT_FAIL:
+      return {loading: false, error: action.payload};
+    default :
+    return state;
+  }
+}
+
+export {productListReducer, productDetailsReducer, productCreateReducer,productEditReducer}

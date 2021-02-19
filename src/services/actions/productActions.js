@@ -1,17 +1,17 @@
 import productConstants from '../constants/product';
 import api from "../api";
 
-const listProducts = (token) => async (dispatch) => {
+const listProducts = () => async (dispatch, getState) => {
 
   try{
     var response;
     
     dispatch({type: productConstants.PRODUCT_LIST_REQUEST});
-    
-    if (!token) response = await api.get("/product");
+    const { userLogin: {userInfo }} = getState();
+    if (!userInfo.token) response = await api.get("/product");
     
     else response = await api.get('/user/product', {headers:{
-      Authorization: 'Bearer '+token
+      'Authorization': 'Bearer '+userInfo.token
     }});
     
     const {data} = response;
@@ -33,24 +33,32 @@ const productDetails = (productID) => async (dispatch) => {
   }
 }
 
-const productCreate = (data, token) => async (dispatch) => {
+const productCreate = (product) => async (dispatch ,getState) => {
+  product.images = [];
   try {
     dispatch({type: productConstants.PRODUCT_SAVE_REQUEST});
-    const response = await api.post("/user/product", data, {headers:{
-      Authorization: 'Bearer ' + token
-    }});
-    dispatch({type: productConstants.PRODUCT_SAVE_SUCCESS, payload: response.data})
+    const { userLogin : { userInfo }} = getState();
+    const {data} = await api.post("/user/product", product, {
+      headers:{
+        'Authorization': 'Bearer ' + userInfo.token
+      } 
+    });
+    dispatch({type: productConstants.PRODUCT_SAVE_SUCCESS, payload: data});
+
   } catch (error) {
     dispatch({type: productConstants.PRODUCT_SAVE_FAIL, payload: error.message});
   }
 }
 
-const productEdit = (productID, data, token) => async (dispatch) => {
+const productEdit = (newProductData) => async (dispatch, getState) => {
+  const {userLogin:{userInfo}} = getState();
   try {
-    dispatch({type: productConstants.PRODUCT_EDIT_REQUEST});
-    const response = await api.put("/user/product/"+productID, data, {headers:{
-      Authorization: 'Bearer '+token
+    dispatch({type: productConstants.PRODUCT_EDIT_REQUEST, payload: newProductData});
+    const response = await api.put("/user/product/"+newProductData._id, newProductData, {
+      headers:{
+      'Authorization': 'Bearer '+userInfo.token
     }});
+
     dispatch({type: productConstants.PRODUCT_EDIT_SUCCESS, payload: response.data})
   } catch (error) {
     dispatch({type: productConstants.PRODUCT_EDIT_FAIL, payload: error.message});
@@ -60,13 +68,57 @@ const productEdit = (productID, data, token) => async (dispatch) => {
 const productDelete = (productID, token) => async (dispatch) => {
   try {
     dispatch({type: productConstants.PRODUCT_DELETE_REQUEST});
+    
     const {data} = await api.delete("/user/product/"+productID, {headers:{
-      Authorization: 'Bearer '+token
+      'Authorization': 'Bearer '+token
     }});
+
     dispatch({type: productConstants.PRODUCT_DELETE_SUCCESS, payload: data})
   } catch (error) {
     dispatch({type: productConstants.PRODUCT_DELETE_FAIL, payload: error.message});
   }
 }
 
-export { listProducts, productDetails, productCreate, productEdit, productDelete }
+const deleteImages = (imagesIds) => async (dispatch, getState) => {
+  const {userLogin:{userInfo}} = getState();
+  try{
+    dispatch({type: productConstants.DELETE_IMAGES_REQUEST, payload: imagesIds});
+    const { data } = await api.delete("/user/image?images="+imagesIds,{
+      headers:{
+        'Authorization': 'Bearer '+userInfo.token
+      }
+    });
+    dispatch({type: productConstants.DELETE_IMAGES_SUCCESS, payload: data});
+  }catch(error){
+    dispatch({type: productConstants.DELETE_IMAGES_FAIL, payload: error});
+  }
+}
+
+const uploadImages = (images, productID) => async (dispatch, getState) =>{
+    const { userLogin: {userInfo }} = getState();
+    const { productSave } = getState();
+    dispatch({type: productConstants.UPLOAD_IMAGES_REQUEST, payload:images});
+    
+    const formData = new FormData();
+    if(!productID) formData.append('reference', productSave.product._id);
+    else formData.append('reference', productID);
+    
+    for (let i = 0 ; i < images.length ; i++) {
+      if( images[i].file ) formData.append("file", images[i].file);
+    }   
+    
+    try{
+      const { data } = await api.post("/user/image",formData,{
+        headers:{
+          'Authorization': 'Bearer '+userInfo.token,
+          'Content-Type':'multipart/form-data'
+        }
+      });
+      
+      dispatch({type: productConstants.UPLOAD_IMAGES_SUCCESS, payload: data})
+    }catch(error){
+      dispatch({type: productConstants.UPLOAD_IMAGES_FAIL, payload: error.response});
+    }
+}
+
+export { listProducts, productDetails, productCreate, productEdit, productDelete,deleteImages,uploadImages }

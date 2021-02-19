@@ -1,12 +1,26 @@
 import userConstants from "../constants/user";
 
 function userLoginReducer( state={}, action){
+  
   switch( action.type){
     case userConstants.USER_LOGIN_REQUEST:
       return {loading:true};
     case userConstants.USER_LOGIN_SUCCESS:
       return {loading: false, userInfo: action.payload};
     case userConstants.USER_LOGIN_FAIL:
+      return {loading: false, error: action.payload};
+    default: 
+      return state;
+  }
+}
+
+function userLogoutReducer( state={userInfo:null}, action){
+  switch( action.type){
+    case userConstants.USER_LOGOUT_REQUEST:
+      return {loading:true};
+    case userConstants.USER_LOGOUT_SUCCESS:
+      return {loading: false, userInfo: action.payload};
+    case userConstants.USER_LOGOUT_FAIL:
       return {loading: false, error: action.payload};
     default: 
       return state;
@@ -65,4 +79,4 @@ function userDetailsReducer( state={}, action){
   }
 }
 
-export { userLoginReducer, userDeleteReducer, userRegisterReducer, userEditReducer, userDetailsReducer }
+export { userLogoutReducer, userLoginReducer, userDeleteReducer, userRegisterReducer, userEditReducer, userDetailsReducer }

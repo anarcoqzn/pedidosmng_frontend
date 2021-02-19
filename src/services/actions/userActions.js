@@ -59,4 +59,11 @@ const detailsUser = (userID) => async (dispatch) =>{
   }
 }
 
-export {submitLogin, submitRegister, editUser, deleteUser, detailsUser}
+const userLogout = () => async (dispatch) => {
+ 
+  await dispatch({type: userConstants.USER_LOGOUT_REQUEST, payload: null});
+  await Cookie.set('userInfo', JSON.stringify(null));
+  await dispatch({type: userConstants.USER_LOGOUT_SUCCESS, payload: null});
+}
+
+export {submitLogin, submitRegister, editUser, deleteUser, detailsUser, userLogout}

@@ -33,9 +33,10 @@ export default function Login(props) {
 
   useEffect(() => {
     if( userInfo ) props.history.push('/');
-  },[userInfo, props.history]);
+  },[userInfo,  props.history]);
 
   useEffect(()=>{
+    
     if ( error ){
       if( error.data === "Usuário não encontrado." ) setLoginError(true);
       else setLoginError(false);
@@ -46,6 +47,7 @@ export default function Login(props) {
   },[loginError, passwordError, error])
 
   return (
+    loading ? <Loading /> :
     <Container>
       <span>LOGIN</span>
       <span id="error">{error ? error.data: null}</span>
@@ -56,7 +58,7 @@ export default function Login(props) {
         value={password} onChange={handlePassword}/>
       
       <div className="buttons">
-      {loading ? <Button><Loading/></Button>:<Button color='royalblue' onClick={handleLoginButton}>LOGIN</Button>}
+      <Button color='royalblue' onClick={handleLoginButton}>LOGIN</Button>
       <Button color='coral' onClick={()=>props.history.push("/cadastro")}>CADASTRAR</Button>
       </div>
     </Container>

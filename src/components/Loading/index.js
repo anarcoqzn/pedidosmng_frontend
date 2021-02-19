@@ -22,6 +22,7 @@ export const Loading = styled.div`
   height: 2vw;
   border-radius: 50%;
   display: flex;
+  margin-top: 30vw;
   margin-left: auto;
   margin-right: auto;
 `;

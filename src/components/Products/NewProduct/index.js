@@ -5,30 +5,43 @@ import { uniqueId } from 'lodash';
 import  {Button} from '../../Button/styles.js';
 import api from '../../../services/api';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import ProductCard from '../ProductCard';
 import FileList from '../FileList';
 import {Container} from './styles.js';
+import { deleteImages, productCreate, productEdit, uploadImages } from '../../../services/actions/productActions';
+import { Loading } from '../../Loading';
+import Error from '../../Error';
 const { confirm } = Modal;
 
-export default function NewProduct({setLoadProducts, editProduct}) {
+export default function NewProduct({setLoadProducts, editProduct, setNewProduct}) {
   const [ name, setName ] = useState("");
   const [ value, setValue ] = useState(0);
   const [ description, setDescription ] = useState("");
   const [ size, setSize ] = useState([]);
   const [ quantity, setQuantity ] = useState(0);
-  const [ images, setImages ] = useState([]);
   const [ category, setCategory ] = useState("");
+  const [ images, setImages ] = useState([]);
+  const [imagesToUpload, setImagesToUpload] = useState([]);
+  const [imagesToRemove, setImagesToRemove] = useState([]);
   const filesize = require('filesize');
-
+  
   function handleName(input) {setName(input.target.value)};
   function handleValue(input){setValue(input)};
   function handleDescription(input){setDescription(input.target.value);}
   function handleQuantity(input){setQuantity(input);}
   function handleCategory(input){setCategory(input.target.value.toUpperCase())};
-
+  
   const {userInfo} = useSelector(state => state.userLogin);
+  const productSave = useSelector(state => state.productSave);
+  const editProductState = useSelector(state => state.productEdit);
+  
+  const dispatch = useDispatch();
+  const {loading: loadingSave, error:errorSave} = productSave;
+  const {loading: loadingEdit, error: errorEdit} = editProductState;
+  const [ loading, setLoading ] = useState(loadingEdit || loadingSave);
+  const [ error, setError ] = useState(errorSave || errorEdit);
 
   function handleSize(input) {
     const element = document.getElementById(input);
@@ -57,11 +70,15 @@ export default function NewProduct({setLoadProducts, editProduct}) {
         url: URL.createObjectURL(file)
       }
     });
-    setImages(img => img.concat(uploadedFiles));
+    setImagesToUpload(img => img.concat(uploadedFiles));
   }
 
   function onDelete(image) {
-    setImages(images.filter(img => img._id !== image._id));
+    if(image.file) setImagesToUpload(imagesToUpload.filter(img => img._id !== image._id));
+    else {
+      setImages(images.filter(img => img._id !== image._id));
+      setImagesToRemove(img => img.concat(image._id));
+    }
   };
 
   function isEmpty(str) {
@@ -70,7 +87,7 @@ export default function NewProduct({setLoadProducts, editProduct}) {
   }
 
   async function confirmProduct() {
-    if (!isEmpty(name) && value > 0 && images.length > 0){
+    if (!isEmpty(name) && value > 0 && (imagesToUpload.length > 0 || images.length > 0)){
       var data = {}
       if(!editProduct){
         data = {
@@ -80,56 +97,29 @@ export default function NewProduct({setLoadProducts, editProduct}) {
           size:size,
           quantity:quantity,
           category,
-          images:[],
           createdBy: userInfo.user._id
         };
-        
-        const temp = await api.post('/user/product', data, {
-          headers:{
-            Authorization: 'Bearer '+userInfo.token
-          }
-        });
-        const ids = await processImages(temp.data._id);
-        data = {images:ids}
-
-        await api.put(`/user/product/${temp.data._id}`,data, {
-          headers:{
-            Authorization: 'Bearer '+userInfo.token
-          }
-        });
-        message.success("Novo produto criado com sucesso!");
+        await dispatch(productCreate(data));
+        await dispatch(uploadImages(imagesToUpload));
       }
       else{
-        const ids = await processImages(editProduct._id);
         
-        for( let i = 0; i < editProduct.images.length; i++) {
-          const img = editProduct.images[i]._id;
-          if( !ids.includes(img)) await api.delete(`/user/image/${img}`,{
-            headers:{
-              Authorization: 'Bearer '+userInfo.token
-            }
-          });
-        }
+        if (imagesToUpload.length > 0) await dispatch(uploadImages(imagesToUpload,editProduct._id));
+        if (imagesToRemove.length > 0) await dispatch(deleteImages(imagesToRemove));
 
         data = {
+          _id:editProduct._id,
           name:name,
           value:value,
           description:description,
           size:size,
           quantity:quantity,
-          category,
-          images:ids
+          category: category
         };
-
-        await api.put(`/user/product/${editProduct._id}`,data,{
-          headers:{
-            Authorization: 'Bearer '+userInfo.token
-          }
-        });
+        await dispatch(productEdit(data));
         message.success("Produto alterado com sucesso!");
       }
       clearAll();
-    
     }else {
       message.warning("O nome, valor e imagem do produto são obrigatórios!")
     }
@@ -178,30 +168,6 @@ export default function NewProduct({setLoadProducts, editProduct}) {
     });
   }
 
-  async function processImages(productID){
-    var ids = [];
-    for (let i = 0; i < images.length; i++){
-      if( images[i].file ){
-        const file = images[i];
-        const data = new FormData();
-        
-        data.append('file', file.file);
-        data.append('name', file.name);
-        data.append('reference',productID);
-        
-        const response = await api.post('/user/image', data, {
-          headers:{
-            Authorization: 'Bearer '+userInfo.token
-          }
-        });
-        ids.push(response.data._id);      
-      }else{
-        ids.push(images[i]._id);
-      }
-    }
-    return ids;
-  }
-
   function clearAll() {
     setName("");
     setValue(0);
@@ -209,8 +175,11 @@ export default function NewProduct({setLoadProducts, editProduct}) {
     setSize([]);
     setQuantity(0);
     setImages([]);
+    setImagesToUpload([]);
+    setImagesToRemove([]);
     setCategory("");
     setLoadProducts(prev => !prev);
+    setNewProduct(false);
   }
 
   useEffect(() => {
@@ -220,7 +189,11 @@ export default function NewProduct({setLoadProducts, editProduct}) {
     setSize([]);
     setQuantity(0);
     setImages([]);
+    setImagesToUpload([]);
+    setImagesToRemove([]);
     setCategory("");
+    setError(null);
+    setLoading(false);
 
     if(editProduct){
       setName(editProduct.name);
@@ -228,8 +201,8 @@ export default function NewProduct({setLoadProducts, editProduct}) {
       setSize(editProduct.size);
       setQuantity(editProduct.quantity);
       setDescription(editProduct.description);
-      setImages(editProduct.images);
       setCategory(editProduct.category);
+      setImages(editProduct.images);
     
       for (let i = 0; i < editProduct.size.length; i++) {
         document.getElementById(editProduct.size[i]).style.backgroundColor = "#1890ff";
@@ -239,55 +212,68 @@ export default function NewProduct({setLoadProducts, editProduct}) {
   },[editProduct]);
 
   return (
+    loading ? <Loading /> :
     <Container>
-    <Form
+      <Form
       labelCol={{ span: 6 }}
       wrapperCol={{ span: 14 }}
       layout="horizontal"
       >
       <p >Crie um novo produto:</p>
-      <Form.Item label="Nome" required>
-        <Input value={name} maxLength={34} onChange={handleName} placeholder="Nome do Produto"/>
-      </Form.Item>
+      { (error) ? <Error msg={error}/> : 
+      <div>
+        <Form.Item label="Nome" required>
+          <Input value={name} maxLength={34} onChange={handleName} placeholder="Nome do Produto"/>
+        </Form.Item>
 
-      <Form.Item label="Valor" required>
-        <InputNumber value={value} style={{width:"100%"}} min={0} onChange={handleValue}/>
-      </Form.Item>
+        <Form.Item label="Valor" required>
+          <InputNumber value={value} style={{width:"100%"}} min={0} onChange={handleValue}/>
+        </Form.Item>
 
-      <Form.Item label="Detalhes">
-        <Input value={description} onChange={handleDescription} placeholder="Fale sobre o Produto"/>
-      </Form.Item>
+        <Form.Item label="Detalhes">
+          <Input value={description} onChange={handleDescription} placeholder="Fale sobre o Produto"/>
+        </Form.Item>
 
-      <Form.Item label="Categoria">
-        <Input value={category} onChange={handleCategory} placeholder="Ex.: Calça, Blusa, Caneca"/>
-      </Form.Item>
+        <Form.Item label="Categoria">
+          <Input value={category} onChange={handleCategory} placeholder="Ex.: Calça, Blusa, Caneca"/>
+        </Form.Item>
 
-      <Form.Item label="Tamanhos">
-        <Button id="PP" color="#1890ff" onClick={()=>handleSize("PP")}>PP</Button>
-        <Button id="P" color="#1890ff" onClick={()=>handleSize("P")}>P</Button>
-        <Button id="M" color="#1890ff" onClick={()=>handleSize("M")}>M</Button>
-        <Button id="G" color="#1890ff" onClick={()=>handleSize("G")}>G</Button>
-        <Button id="GG" color="#1890ff" onClick={()=>handleSize("GG")}>GG</Button>
-      </Form.Item>
+        <Form.Item label="Tamanhos">
+          <Button id="PP" color="#1890ff" onClick={()=>handleSize("PP")}>PP</Button>
+          <Button id="P" color="#1890ff" onClick={()=>handleSize("P")}>P</Button>
+          <Button id="M" color="#1890ff" onClick={()=>handleSize("M")}>M</Button>
+          <Button id="G" color="#1890ff" onClick={()=>handleSize("G")}>G</Button>
+          <Button id="GG" color="#1890ff" onClick={()=>handleSize("GG")}>GG</Button>
+        </Form.Item>
 
-      <Form.Item label="Estoque">
-        <InputNumber value={quantity} min={1} onChange={handleQuantity}/>
-      </Form.Item>
+        <Form.Item label="Estoque">
+          <InputNumber value={quantity} min={1} onChange={handleQuantity}/>
+        </Form.Item>
 
-      <div className="upload-box">
-        <Upload onUpload={onUpload}/>
+        <div className="upload-box">
+          <Upload onUpload={onUpload}/>
+        </div>
+
+      <div className="preview">
+        <div className='card'>
+          <ProductCard 
+            product={{
+              name:name,
+              value:value,
+              description:description,
+              images: images.concat(imagesToUpload)
+            }}
+          />
+        </div>
+        <FileList 
+          files={images.concat(imagesToUpload)} 
+          onDelete={onDelete}
+        />
       </div>
+    </div>}
     </Form>
-
-    <div className="preview">
-      <div className='card'>
-        <ProductCard product={{name:name,value:value,description:description,images:images}}/>
-      </div>
-      <FileList files={images} onDelete={onDelete}/>
-    </div>
-
     <div className="create-cancel-btns">
-      <Button color="#32CD32" onClick={confirmProduct}>Confirmar</Button>
+      {error?null:<Button color="#32CD32" onClick={confirmProduct}>Confirmar</Button>}
       <Button color="#FFD700" onClick={clearAll}>Cancelar</Button>
       {editProduct ? <Button color="#DB7093" onClick={checkProductDelete} >Deletar</Button>:null}
     </div>

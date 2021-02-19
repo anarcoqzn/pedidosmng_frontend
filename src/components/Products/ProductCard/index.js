@@ -3,7 +3,7 @@ import { Carousel } from 'antd';
 import { Card, ProductInfo, Image } from './styles'
 
 export default function ProductCard({product}) {
-  
+
   return (
     <Card>
       <Carousel

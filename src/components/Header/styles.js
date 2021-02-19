@@ -35,7 +35,15 @@ export const HeaderContainer = styled.header`
     margin-left: auto;
     margin-right: 1vw;
     a {
+      margin-right: 1vw;
       color: #FFF;
+      :hover {
+        color: darkorange;
+      }
+    }
+
+    span {
+      cursor: pointer;
       :hover {
         color: darkorange;
       }

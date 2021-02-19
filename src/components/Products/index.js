@@ -8,13 +8,13 @@ import { message } from 'antd';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { listProducts } from '../../services/actions/productActions';
+import { Loading } from '../Loading';
 
 
 export default function Products(props) {
   const [newProduct, setNewProduct] = useState(false);
   const [loadProducts, setLoadProducts] = useState(false);
   const [edit, setEdit] = useState(null);
-  const {userInfo} = useSelector(state => state.userLogin);
   
   const productList = useSelector(state => state.productList);
   const { products, loading, error } = productList;
@@ -59,14 +59,13 @@ export default function Products(props) {
     setEdit(null);
     setNewProduct(false);
     
-    if(userInfo) dispatch(listProducts(userInfo.token));
-    else dispatch(listProducts());
+    dispatch(listProducts());
     setSelectedProducts(props.products);
     
-  },[loadProducts, userInfo, dispatch, props.products]);
+  },[loadProducts, dispatch, props.products]);
 
   return (
-    loading ? < div>LOADING ...</div> :
+    loading ? <Loading /> :
     error ? <div>{error}</div>:
     newProduct ? 
     <NewProduct setNewProduct={setNewProduct} setLoadProducts={setLoadProducts} editProduct={edit}/> :

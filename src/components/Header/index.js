@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HeaderContainer } from './styles.js';
 import img from "../../assets/favico.png";
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-export default function Header({userInfo}) {
+export default function Header() {
+  
+  const userLogin = useSelector(state => state.userLogin);
+  const { userInfo } = userLogin;
 
   return (
     <HeaderContainer > 
@@ -15,9 +19,17 @@ export default function Header({userInfo}) {
         </a>
       </div>
 
+      {userInfo && userInfo.token? 
       <div className="userName"> 
-        {userInfo ? <Link to="/profile">{userInfo.user.userName}</Link>: <Link to="/cadastro">Cadastro</Link>}
+        <Link to="/profile">{userInfo.user.userName}</Link>
+        <a href="/logout">Sair</a>
       </div>
+      : 
+      <div className="userName"> 
+        <Link to="/login">Login</Link>
+        <Link to="/cadastro">Cadastro</Link>
+      </div>}
+    
     </HeaderContainer>
   )
 }
