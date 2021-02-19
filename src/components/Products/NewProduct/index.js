@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ProductCard from '../ProductCard';
 import FileList from '../FileList';
 import {Container} from './styles.js';
-import { deleteImages, productCreate, productEdit, uploadImages } from '../../../services/actions/productActions';
+import { deleteImages, productCreate, productDelete, productEdit, uploadImages } from '../../../services/actions/productActions';
 import { Loading } from '../../Loading';
 import Error from '../../Error';
 const { confirm } = Modal;
@@ -131,11 +131,7 @@ export default function NewProduct({setLoadProducts, editProduct, setNewProduct}
   }
 
   async function deleteProduct(){
-    await api.delete(`/user/product/${editProduct._id}`, {
-      headers: {
-        Authorization: 'Bearer '+userInfo.token
-      }
-    });
+    dispatch(productDelete(editProduct._id));
     message.success("Produto apagado com sucesso!")
     clearAll();
   }
@@ -198,16 +194,11 @@ export default function NewProduct({setLoadProducts, editProduct, setNewProduct}
     if(editProduct){
       setName(editProduct.name);
       setValue(editProduct.value);
-      setSize(editProduct.size);
       setQuantity(editProduct.quantity);
       setDescription(editProduct.description);
       setCategory(editProduct.category);
       setImages(editProduct.images);
-    
-      for (let i = 0; i < editProduct.size.length; i++) {
-        document.getElementById(editProduct.size[i]).style.backgroundColor = "#1890ff";
-        document.getElementById(editProduct.size[i]).style.color = "white";
-      }
+      setSize(editProduct.size);
     }
   },[editProduct]);
 
@@ -239,11 +230,11 @@ export default function NewProduct({setLoadProducts, editProduct, setNewProduct}
         </Form.Item>
 
         <Form.Item label="Tamanhos">
-          <Button id="PP" color="#1890ff" onClick={()=>handleSize("PP")}>PP</Button>
-          <Button id="P" color="#1890ff" onClick={()=>handleSize("P")}>P</Button>
-          <Button id="M" color="#1890ff" onClick={()=>handleSize("M")}>M</Button>
-          <Button id="G" color="#1890ff" onClick={()=>handleSize("G")}>G</Button>
-          <Button id="GG" color="#1890ff" onClick={()=>handleSize("GG")}>GG</Button>
+          <Button id="PP" chosen={size} color="#1890ff" onClick={()=>handleSize("PP")}>PP</Button>
+          <Button id="P" chosen={size} color="#1890ff" onClick={()=>handleSize("P")}>P</Button>
+          <Button id="M" chosen={size} color="#1890ff" onClick={()=>handleSize("M")}>M</Button>
+          <Button id="G" chosen={size} color="#1890ff" onClick={()=>handleSize("G")}>G</Button>
+          <Button id="GG" chosen={size} color="#1890ff" onClick={()=>handleSize("GG")}>GG</Button>
         </Form.Item>
 
         <Form.Item label="Estoque">

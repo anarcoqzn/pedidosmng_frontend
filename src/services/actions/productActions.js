@@ -65,12 +65,14 @@ const productEdit = (newProductData) => async (dispatch, getState) => {
   }
 }
 
-const productDelete = (productID, token) => async (dispatch) => {
+const productDelete = (productID) => async (dispatch, getState) => {
+  const {userLogin: { userInfo }} = getState();
   try {
     dispatch({type: productConstants.PRODUCT_DELETE_REQUEST});
     
-    const {data} = await api.delete("/user/product/"+productID, {headers:{
-      'Authorization': 'Bearer '+token
+    const {data} = await api.delete("/user/product/"+productID, {
+      headers:{
+      'Authorization': 'Bearer '+userInfo.token
     }});
 
     dispatch({type: productConstants.PRODUCT_DELETE_SUCCESS, payload: data})
